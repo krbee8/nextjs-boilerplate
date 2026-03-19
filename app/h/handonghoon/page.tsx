@@ -2,72 +2,48 @@
 
 import { useState } from "react";
 
+type Item = {
+  id: number;
+  type: string;
+  source: string;
+  title: string;
+  time: string;
+  summary: string;
+  mood: string;
+};
+
 export default function HandonghoonPage() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [lastUpdated, setLastUpdated] = useState("방금 전");
-  const [items, setItems] = useState([
+  const [items, setItems] = useState<Item[]>([
     {
       id: 1,
       type: "뉴스",
       source: "네이버 뉴스",
-      title: "한동훈 관련 주요 기사 예시 1",
-      time: "10분 전",
-      summary:
-        "전용 주소로 들어왔을 때 관련 기사와 유튜브를 한눈에 모아보는 허브 화면입니다.",
-      mood: "의견 엇갈림",
-    },
-    {
-      id: 2,
-      type: "유튜브",
-      source: "YouTube",
-      title: "한동훈 관련 유튜브 영상 예시 1",
-      time: "25분 전",
-      summary:
-        "카톡에 링크 하나만 보내고 들어오면 관련 콘텐츠가 모여 보이게 만드는 예시입니다.",
-      mood: "관심 높음",
+      title: "불러오기 전 기본 항목",
+      time: "대기 중",
+      summary: "새로고침을 누르면 서버에서 최신 유튜브 데이터를 받아옵니다.",
+      mood: "대기중",
     },
   ]);
 
   const handleRefresh = async () => {
-    setIsRefreshing(true);
+    try {
+      setIsRefreshing(true);
 
-    await new Promise((resolve) => setTimeout(resolve, 1200));
+      const response = await fetch("/api/refresh");
+      const data = await response.json();
 
-    setItems([
-      {
-        id: 1,
-        type: "뉴스",
-        source: "네이버 뉴스",
-        title: "한동훈 관련 최신 기사 예시 A",
-        time: "방금 전",
-        summary:
-          "새로고침 버튼을 눌렀을 때 최신 콘텐츠가 들어온 것처럼 보이게 만드는 예시입니다.",
-        mood: "의견 엇갈림",
-      },
-      {
-        id: 2,
-        type: "유튜브",
-        source: "YouTube",
-        title: "한동훈 관련 최신 유튜브 영상 예시 B",
-        time: "1분 전",
-        summary:
-          "나중에는 이 자리에 실제 유튜브 검색 결과가 들어오도록 연결할 예정입니다.",
-        mood: "관심 높음",
-      },
-      {
-        id: 3,
-        type: "뉴스",
-        source: "네이버 뉴스",
-        title: "한동훈 관련 추가 기사 예시 C",
-        time: "3분 전",
-        summary:
-          "지금은 임시 데이터지만, 다음 단계에서 네이버 뉴스 API와 연결하기 쉽게 만든 구조입니다.",
-        mood: "팩트체크 요구",
-      },
-    ]);
-
-    setLastUpdated("지금 막 업데이트됨");
-    setIsRefreshing(false);
+      if (data.success) {
+        setItems(data.items);
+        setLastUpdated(data.lastUpdated);
+      }
+    } catch (error) {
+      console.error("새로고침 실패:", error);
+      alert("업데이트에 실패했어요.");
+    } finally {
+      setIsRefreshing(false);
+    }
   };
 
   return (
@@ -124,8 +100,7 @@ export default function HandonghoonPage() {
               marginBottom: 24,
             }}
           >
-            이제부터는 메인 주소가 아니라 전용 주소로 한동훈 관련 링크 허브를
-            볼 수 있습니다.
+            이제부터는 메인 주소가 아니라 전용 주소로 한동훈 관련 링크 허브를 볼 수 있습니다.
           </p>
 
           <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
