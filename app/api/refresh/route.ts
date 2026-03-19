@@ -2,7 +2,11 @@ export async function GET() {
   const API_KEY = "AIzaSyBrPfL_wLnPu_Rs44kqG1tlB0lvW5YWAic";
 
   const query = "한동훈";
-
+const cleanText = (text: string) =>
+  text
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&amp;/g, "&");
   try {
     const res = await fetch(
       `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(
