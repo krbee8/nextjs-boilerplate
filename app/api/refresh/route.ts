@@ -7,9 +7,9 @@ const cleanText = (text: string) =>
     .replace(/<\/b>/g, "");
 
 export async function GET() {
-  const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
-  const NAVER_CLIENT_ID = process.env.NAVER_CLIENT_ID;
-  const NAVER_CLIENT_SECRET = process.env.NAVER_CLIENT_SECRET;
+const YOUTUBE_API_KEY = "AIzaSyBrPfL_wLnPu_Rs44kqG1tlB0lvW5YWAic";
+const NAVER_CLIENT_ID = "swFmilpW_zhWu_1dqJuY";
+const NAVER_CLIENT_SECRET = "NqhFmTT7Um";
 
   const query = "한동훈";
 
