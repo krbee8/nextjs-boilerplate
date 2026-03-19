@@ -16,9 +16,8 @@ export async function GET() {
       id: index + 1,
       type: "유튜브",
       source: "YouTube",
-      title: item.snippet.title,
-      time: "방금 전",
-      summary: item.snippet.description || "유튜브 영상입니다.",
+    title: cleanText(item.snippet.title),
+summary: cleanText(item.snippet.description || "유튜브 영상입니다."),
       mood: "실시간",
     }));
 
