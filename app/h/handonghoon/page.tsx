@@ -3,29 +3,22 @@
 import { useState } from "react";
 
 type Item = {
-  id: number;
+  id: string;
   type: string;
   source: string;
   title: string;
   time: string;
   summary: string;
   mood: string;
+  url: string;
 };
 
 export default function HandonghoonPage() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [lastUpdated, setLastUpdated] = useState("방금 전");
-  const [items, setItems] = useState<Item[]>([
-    {
-      id: 1,
-      type: "뉴스",
-      source: "네이버 뉴스",
-      title: "불러오기 전 기본 항목",
-      time: "대기 중",
-      summary: "새로고침을 누르면 서버에서 최신 유튜브 데이터를 받아옵니다.",
-      mood: "대기중",
-    },
-  ]);
+
+  const [youtubeItems, setYoutubeItems] = useState<Item[]>([]);
+  const [newsItems, setNewsItems] = useState<Item[]>([]);
 
   const handleRefresh = async () => {
     try {
@@ -35,7 +28,8 @@ export default function HandonghoonPage() {
       const data = await response.json();
 
       if (data.success) {
-        setItems(data.items);
+        setYoutubeItems(data.youtubeItems || []);
+        setNewsItems(data.newsItems || []);
         setLastUpdated(data.lastUpdated);
       }
     } catch (error) {
@@ -46,12 +40,95 @@ export default function HandonghoonPage() {
     }
   };
 
+  const renderCard = (item: Item) => (
+    <a
+      key={item.id}
+      href={item.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      style={{
+        display: "block",
+        textDecoration: "none",
+        color: "inherit",
+        border: "1px solid #e2e8f0",
+        borderRadius: 16,
+        padding: 16,
+        background: "#fff",
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          gap: 8,
+          marginBottom: 10,
+          flexWrap: "wrap",
+        }}
+      >
+        <span
+          style={{
+            fontSize: 13,
+            color: "#475569",
+            fontWeight: 700,
+          }}
+        >
+          {item.source}
+        </span>
+
+        <span
+          style={{
+            fontSize: 12,
+            padding: "4px 8px",
+            borderRadius: 999,
+            background: "#eff6ff",
+            color: "#1d4ed8",
+            fontWeight: 700,
+          }}
+        >
+          {item.mood}
+        </span>
+      </div>
+
+      <h3
+        style={{
+          margin: "0 0 8px 0",
+          fontSize: 18,
+          lineHeight: 1.4,
+          color: "#0f172a",
+        }}
+      >
+        {item.title}
+      </h3>
+
+      <div
+        style={{
+          fontSize: 13,
+          color: "#64748b",
+          marginBottom: 10,
+        }}
+      >
+        {item.type} · {item.time}
+      </div>
+
+      <p
+        style={{
+          fontSize: 14,
+          lineHeight: 1.6,
+          color: "#334155",
+          margin: 0,
+        }}
+      >
+        {item.summary}
+      </p>
+    </a>
+  );
+
   return (
     <main
       style={{
         minHeight: "100vh",
         background: "#f8fafc",
-        padding: "40px 20px",
+        padding: "30px 16px",
         fontFamily: "Arial, sans-serif",
       }}
     >
@@ -59,21 +136,21 @@ export default function HandonghoonPage() {
         <div
           style={{
             background: "#ffffff",
-            borderRadius: 24,
-            padding: 32,
-            boxShadow: "0 10px 30px rgba(0,0,0,0.06)",
-            marginBottom: 24,
+            borderRadius: 20,
+            padding: 24,
+            boxShadow: "0 8px 24px rgba(0,0,0,0.06)",
+            marginBottom: 20,
           }}
         >
           <div
             style={{
               display: "inline-block",
-              padding: "8px 14px",
+              padding: "6px 12px",
               borderRadius: 999,
               background: "#111827",
               color: "#ffffff",
-              fontSize: 14,
-              marginBottom: 18,
+              fontSize: 13,
+              marginBottom: 14,
             }}
           >
             전용 링크 허브
@@ -81,147 +158,119 @@ export default function HandonghoonPage() {
 
           <h1
             style={{
-              fontSize: 42,
+              fontSize: 34,
               lineHeight: 1.2,
-              margin: "0 0 16px 0",
+              margin: "0 0 12px 0",
               color: "#0f172a",
             }}
           >
             /h/handonghoon
-            <br />
-            전용 페이지
           </h1>
 
           <p
             style={{
-              fontSize: 18,
+              fontSize: 16,
               color: "#475569",
-              lineHeight: 1.7,
-              marginBottom: 24,
+              lineHeight: 1.6,
+              marginBottom: 18,
             }}
           >
-            이제부터는 메인 주소가 아니라 전용 주소로 한동훈 관련 링크 허브를 볼 수 있습니다.
+            한동훈 관련 네이버 기사와 유튜브 영상을 분리해서 볼 수 있는 전용 페이지입니다.
           </p>
 
-          <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-            <button
-              onClick={handleRefresh}
-              disabled={isRefreshing}
-              style={{
-                border: "none",
-                background: isRefreshing ? "#475569" : "#111827",
-                color: "#fff",
-                padding: "12px 18px",
-                borderRadius: 14,
-                cursor: isRefreshing ? "default" : "pointer",
-                fontWeight: 700,
-              }}
-            >
-              {isRefreshing ? "업데이트 중..." : "새로고침"}
-            </button>
-          </div>
+          <button
+            onClick={handleRefresh}
+            disabled={isRefreshing}
+            style={{
+              border: "none",
+              background: isRefreshing ? "#475569" : "#111827",
+              color: "#fff",
+              padding: "10px 16px",
+              borderRadius: 12,
+              cursor: isRefreshing ? "default" : "pointer",
+              fontWeight: 700,
+              fontSize: 14,
+            }}
+          >
+            {isRefreshing ? "업데이트 중..." : "새로고침"}
+          </button>
         </div>
 
         <div
           style={{
-            background: "#ffffff",
-            borderRadius: 24,
-            padding: 24,
-            boxShadow: "0 10px 30px rgba(0,0,0,0.06)",
+            marginBottom: 16,
+            color: "#64748b",
+            fontSize: 14,
+            fontWeight: 600,
           }}
         >
-          <div style={{ marginBottom: 18 }}>
-            <h2 style={{ fontSize: 28, margin: "0 0 8px 0", color: "#0f172a" }}>
-              한동훈 링크 허브
-            </h2>
-            <p style={{ color: "#64748b", margin: 0 }}>
-              마지막 업데이트: {lastUpdated}
-            </p>
-          </div>
+          마지막 업데이트: {lastUpdated}
+        </div>
 
-          <div
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: 20,
+          }}
+        >
+          <section
             style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-              gap: 16,
+              background: "#ffffff",
+              borderRadius: 20,
+              padding: 20,
+              boxShadow: "0 8px 24px rgba(0,0,0,0.06)",
             }}
           >
-            {items.map((item) => (
-              <div
-                key={item.id}
-                style={{
-                  border: "1px solid #e2e8f0",
-                  borderRadius: 20,
-                  padding: 20,
-                  background: "#fff",
-                }}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    gap: 10,
-                    marginBottom: 12,
-                    flexWrap: "wrap",
-                  }}
-                >
-                  <span
-                    style={{
-                      fontSize: 14,
-                      color: "#475569",
-                      fontWeight: 700,
-                    }}
-                  >
-                    {item.source}
-                  </span>
-                  <span
-                    style={{
-                      fontSize: 13,
-                      padding: "6px 10px",
-                      borderRadius: 999,
-                      background: "#eff6ff",
-                      color: "#1d4ed8",
-                      fontWeight: 700,
-                    }}
-                  >
-                    {item.mood}
-                  </span>
+            <h2
+              style={{
+                margin: "0 0 16px 0",
+                fontSize: 24,
+                color: "#0f172a",
+              }}
+            >
+              네이버 기사
+            </h2>
+
+            <div style={{ display: "grid", gap: 12 }}>
+              {newsItems.length > 0 ? (
+                newsItems.map(renderCard)
+              ) : (
+                <div style={{ color: "#64748b", fontSize: 14 }}>
+                  아직 불러온 뉴스가 없습니다. 새로고침을 눌러주세요.
                 </div>
+              )}
+            </div>
+          </section>
 
-                <h3
-                  style={{
-                    margin: "0 0 10px 0",
-                    fontSize: 20,
-                    lineHeight: 1.4,
-                    color: "#0f172a",
-                  }}
-                >
-                  {item.title}
-                </h3>
+          <section
+            style={{
+              background: "#ffffff",
+              borderRadius: 20,
+              padding: 20,
+              boxShadow: "0 8px 24px rgba(0,0,0,0.06)",
+            }}
+          >
+            <h2
+              style={{
+                margin: "0 0 16px 0",
+                fontSize: 24,
+                color: "#0f172a",
+              }}
+            >
+              유튜브 영상
+            </h2>
 
-                <div
-                  style={{
-                    fontSize: 14,
-                    color: "#64748b",
-                    marginBottom: 12,
-                  }}
-                >
-                  {item.type} · {item.time}
+            <div style={{ display: "grid", gap: 12 }}>
+              {youtubeItems.length > 0 ? (
+                youtubeItems.map(renderCard)
+              ) : (
+                <div style={{ color: "#64748b", fontSize: 14 }}>
+                  아직 불러온 영상이 없습니다. 새로고침을 눌러주세요.
                 </div>
-
-                <p
-                  style={{
-                    fontSize: 15,
-                    lineHeight: 1.7,
-                    color: "#334155",
-                    marginBottom: 16,
-                  }}
-                >
-                  {item.summary}
-                </p>
-              </div>
-            ))}
-          </div>
+              )}
+            </div>
+          </section>
         </div>
       </div>
     </main>
